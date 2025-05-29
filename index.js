@@ -10,7 +10,8 @@ app.use(cors());
 app.use(express.json());
 
 // Create MySQL connection using .env
-const db = mysql.createConnection({
+const db = mysql.createPool({
+    connectionLimit: 10,
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
@@ -18,13 +19,6 @@ const db = mysql.createConnection({
     port: process.env.DB_PORT
 });
 
-db.connect(err => {
-    if (err) {
-        console.error('Database connection error:', err);
-        return;
-    }
-    console.log('Connected to MySQL');
-});
 
 app.get('/users', (req, res) => {
     db.query('SELECT * FROM users', (err, results) => {
@@ -35,6 +29,7 @@ app.get('/users', (req, res) => {
         res.json(results);
     });
 });
+
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
